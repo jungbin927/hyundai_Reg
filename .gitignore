@@ -1,0 +1,6 @@
+data/
+__pycache__/
+발표 정리/
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+venv/

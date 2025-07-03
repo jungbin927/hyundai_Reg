@@ -1,0 +1,9 @@
+# 경로: ahn/capstoneV2/monitoring/prometheus.yml
+
+global:
+  scrape_interval: 5s
+
+scrape_configs:
+  - job_name: 'fastapi'
+    static_configs:
+      - targets: ['backend:8000']

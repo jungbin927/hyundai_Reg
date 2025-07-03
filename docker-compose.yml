@@ -1,0 +1,75 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: src/back/Dockerfile
+    container_name: hyundai-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
+    restart: always
+
+  frontend:
+    build:
+      context: .
+      dockerfile: src/front/Dockerfile
+    container_name: hyundai-frontend
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend
+    environment:
+      - PYTHONUNBUFFERED=1
+    restart: always
+    volumes:
+    - ./src/front:/app/src/front
+    - ./src/front/static:/app/static 
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: always
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    volumes:
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    restart: always
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./data/mongo:/data/db
+    
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=pass1234
+
+volumes:
+  prometheus-data:
+  grafana-data:
